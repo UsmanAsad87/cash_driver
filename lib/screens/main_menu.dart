@@ -1,10 +1,13 @@
 
-import 'package:cash_driver/activity_screen.dart';
+import 'package:cash_driver/screens/activity_screen.dart';
 import 'package:cash_driver/constants.dart';
-import 'package:cash_driver/home_screen.dart';
-import 'package:cash_driver/profile_screen.dart';
+import 'package:cash_driver/screens/home_screen.dart';
+import 'package:cash_driver/screens/profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/user_provider.dart';
 
 
 class MainMenu extends StatefulWidget {
@@ -21,8 +24,13 @@ class _MainMenuState extends State<MainMenu> {
 
   @override
   void initState() {
+    addData();
     pageController = PageController();
     super.initState();
+  }
+  addData() async {
+    UserProvider userProvider = Provider.of(context, listen: false);
+    await userProvider.refreshUser();
   }
 
   @override

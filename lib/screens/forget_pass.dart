@@ -1,8 +1,13 @@
 import 'package:cash_driver/constants.dart';
+import 'package:cash_driver/screens/login_screen.dart';
+import 'package:cash_driver/utils/validator.dart';
 import 'package:cash_driver/widgets/custom_button.dart';
 import 'package:cash_driver/widgets/custom_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+
+import '../resources/auth_methods.dart';
+import '../utils/toast.dart';
 
 class ForgetPassScreen extends StatefulWidget {
   static const routeName = '/login_screen';
@@ -16,6 +21,8 @@ class ForgetPassScreen extends StatefulWidget {
 
 class _ForgetPassScreenState extends State<ForgetPassScreen> {
   final TextEditingController _emailController = TextEditingController();
+  GlobalKey<FormState> forgetPassKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -75,7 +82,9 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
                         SizedBox(
                           height: 50.h,
                         ),
-                        IconButton(onPressed:(){}, icon: const Icon(Icons.arrow_back_ios,color: kSecondaryColor,size: 40,)),
+                        IconButton(onPressed:(){
+                          Navigator.pop(context);
+                        }, icon: Icon(Icons.arrow_back_ios,color: kSecondaryColor,size: 40.h,)),
                         SizedBox(
                           height: 30.h,
                         ),
@@ -90,18 +99,59 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
                           'Email',
                           style: kHeadingStyle2,
                         ),
-                        CustomTextField(
-                            obscure: false,
-                            controller: _emailController,
-                            hintText: 'Enter your email',
-                            onChanged: (val) {},
-                            onFieldSubmitted: (val) {}),
+                        Form(
+                          key: forgetPassKey,
+                          child: CustomTextField(
+                              obscure: false,
+                              validatorFn: emailValidator,
+                              inputType: TextInputType.emailAddress,
+                              controller: _emailController,
+                              hintText: 'Enter your email',
+                              onChanged: (val) {},
+                              onFieldSubmitted: (val) {}),
+                        ),
                         SizedBox(
                           height: 20.h,
                         ),
                         Center(
                             child: CustomButton(
-                                onPressed: () {}, buttonText: 'Reset Password')),
+                                onPressed: () async {
+                                  if (_emailController.text.isEmpty) {
+                                    showFlagMsg(
+                                        context: context,
+                                        msg: 'Enter the email',
+                                        textColor: Colors.red);
+                                    return null;
+                                  }
+                                  final form = forgetPassKey.currentState;
+                                  if (form!.validate()) {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    String res = await AuthMethods()
+                                        .resetPassword(email: _emailController.text);
+                                    if (res == "success") {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      showToast('Reset password email is sent.');
+                                      await Future.delayed(Duration(milliseconds: 2000), () {})
+                                          .then((value) => Navigator.push(context, MaterialPageRoute(builder: (_)=>LoginScreen())));
+                                    } else {
+                                      showFlagMsg(
+                                          context: context, msg: res, textColor: Colors.red);
+                                    }
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+
+                                  } else {
+                                    showFlagMsg(
+                                        context: context,
+                                        msg: 'Enter the proper email',
+                                        textColor: Colors.red);
+                                  }
+                                }, buttonText: 'Reset Password')),
 
                         SizedBox(
                           height: 40.h,

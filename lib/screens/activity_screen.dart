@@ -1,6 +1,12 @@
+import 'package:cash_driver/Models/RideModel.dart';
 import 'package:cash_driver/constants.dart';
+import 'package:cash_driver/resources/ride_methods.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../utils/loader.dart';
 
 class ActivityScreen extends StatefulWidget {
   static const routeName = '/activity_screen';
@@ -37,15 +43,47 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: 5,
-                      itemBuilder:(context,index){
-                    return ActivityTile(kms: 250,  points: 20, isAlert: index%2==0?true:false);
-                  }),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection('rides').orderBy('dateTime',descending: true)
+                          .snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                      snapshot){
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Padding(
+                              padding: EdgeInsets.all(30.h), child: spinKit());
+                        }
+                        if (snapshot.data!.docs.isEmpty) {
+                          return Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding:
+                                EdgeInsets.only(left: 20.0.w, top: 30.h),
+                                child: Text(
+                                  'There are no Activities',
+                                  style: kBodyStyle8,
+                                ),
+                              ));
+                        }
+                        return ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            RideModel ride = RideModel.fromJson(
+                                snapshot.data!.docs[index].data());
+                            print(snapshot.data!.docs[index].data());
+                            print(ride.distance);
+                            return ActivityTile(kms: ride.distance,  points:ride.points, isAlert: ride.isSpeedLess20);
+                          },
+                        );
 
-
+                      }
+                  ),
                 ],
               ),
             ),
@@ -57,8 +95,8 @@ class _ActivityScreenState extends State<ActivityScreen> {
 }
 
 class ActivityTile extends StatelessWidget {
-  final int kms;
-  final int points;
+  final String kms;
+  final String points;
   final bool isAlert;
   const ActivityTile({
     Key? key, required this.kms, required this.points, required this.isAlert,
