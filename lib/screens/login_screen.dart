@@ -1,8 +1,15 @@
 import 'package:cash_driver/constants.dart';
+import 'package:cash_driver/screens/forget_pass.dart';
+import 'package:cash_driver/screens/main_menu.dart';
+import 'package:cash_driver/screens/signup_screen.dart';
+import 'package:cash_driver/utils/validator.dart';
 import 'package:cash_driver/widgets/custom_button.dart';
 import 'package:cash_driver/widgets/custom_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+
+import '../resources/auth_methods.dart';
+import '../utils/toast.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login_screen';
@@ -17,6 +24,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  GlobalKey<FormState> loginInKey = GlobalKey<FormState>();
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -84,28 +94,40 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(
                           height: 20.h,
                         ),
-                        Text(
-                          'Email',
-                          style: kHeadingStyle2,
+                        Form(
+                          key: loginInKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Email',
+                                style: kHeadingStyle2,
+                              ),
+                              CustomTextField(
+                                validatorFn: emailValidator,
+                                  obscure: false,
+                                  controller: _emailController,
+                                  hintText: 'Enter your email',
+                                  onChanged: (val) {},
+                                  onFieldSubmitted: (val) {}),
+                              Text(
+                                'Password',
+                                style: kHeadingStyle2,
+                              ),
+                              CustomTextField(
+                                validatorFn: passValidator,
+                                  obscure: true,
+                                  controller: _passController,
+                                  hintText: 'Enter your password',
+                                  onChanged: (val) {},
+                                  onFieldSubmitted: (val) {}),
+                            ],
+                          ),
                         ),
-                        CustomTextField(
-                            obscure: false,
-                            controller: _emailController,
-                            hintText: 'Enter your email',
-                            onChanged: (val) {},
-                            onFieldSubmitted: (val) {}),
-                        Text(
-                          'Password',
-                          style: kHeadingStyle2,
-                        ),
-                        CustomTextField(
-                            obscure: true,
-                            controller: _passController,
-                            hintText: 'Enter your password',
-                            onChanged: (val) {},
-                            onFieldSubmitted: (val) {}),
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_)=>ForgetPassScreen()));
+                          },
                           child: Align(
                               alignment: Alignment.centerRight,
                               child:
@@ -116,7 +138,44 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Center(
                             child: CustomButton(
-                                onPressed: () {}, buttonText: 'Login')),
+                              isLoading: _isLoading,
+                                onPressed: () async {
+                                  if (_emailController.text.isEmpty ||
+                                      _passController.text.isEmpty) {
+                                    showFlagMsg(
+                                        context: context,
+                                        msg: 'Enter all Fields',
+                                        textColor: Colors.red);
+                                    return null;
+                                  }
+                                  final form = loginInKey.currentState;
+                                  if (form!.validate()) {
+                                    form.save();
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    String res = await AuthMethods().loginUser(
+                                        email: _emailController.text,
+                                        password: _passController.text);
+                                    if (res == "success") {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Navigator.push(context, MaterialPageRoute(builder: (_)=>MainMenu()));
+                                    } else {
+                                      showFlagMsg(
+                                          context: context, msg: res, textColor: Colors.red);
+                                    }
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  } else {
+                                    showFlagMsg(
+                                        context: context,
+                                        msg: 'Required fields are missing',
+                                        textColor: Colors.red);
+                                  }
+                                }, buttonText: 'Login')),
 
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -158,9 +217,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Center(
                             child: CustomButton(
-                                onPressed: () {}, buttonText: 'Sign Up')),
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (_)=>SignupScreen()));
+                                }, buttonText: 'Sign Up')),
                         SizedBox(
-                          height: 40.h,
+                          height: 60.h,
                         ),
                       ],
                     )),

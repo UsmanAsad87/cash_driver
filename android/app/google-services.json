@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "272580846123",
+    "project_id": "cash-driver-8e4bd",
+    "storage_bucket": "cash-driver-8e4bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272580846123:android:d8261238dce021a329806e",
+        "android_client_info": {
+          "package_name": "com.example.cash_driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272580846123-v0840cm19a6hhfr14bofn341mpnlmp2k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cash_driver",
+            "certificate_hash": "45f155e1dc18a8f0da6d7dad1f997a4e1256f0c9"
+          }
+        },
+        {
+          "client_id": "272580846123-hh3sefrhkrf0sefhisefe97agjkg28gr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYVb1RjTqrTtPnvKE1G1OBZaZ7F1nWugw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272580846123-hh3sefrhkrf0sefhisefe97agjkg28gr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "272580846123-s5273fibrsgmai3cl16p90eoc6jqjel5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cashDriver"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>272580846123-s5273fibrsgmai3cl16p90eoc6jqjel5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.272580846123-s5273fibrsgmai3cl16p90eoc6jqjel5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>272580846123-v0840cm19a6hhfr14bofn341mpnlmp2k.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDSpIB-47j1h7fuB4iA25IE1xRRDCp19sE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>272580846123</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.cashDriver</string>
+	<key>PROJECT_ID</key>
+	<string>cash-driver-8e4bd</string>
+	<key>STORAGE_BUCKET</key>
+	<string>cash-driver-8e4bd.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:272580846123:ios:9e71c2a3dbb3257529806e</string>
+</dict>
+</plist>

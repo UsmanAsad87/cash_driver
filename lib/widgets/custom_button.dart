@@ -1,4 +1,5 @@
 import 'package:cash_driver/constants.dart';
+import 'package:cash_driver/utils/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,10 +7,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomButton extends StatelessWidget {
   CustomButton({
     required this.onPressed,
-    required this.buttonText,
+    required this.buttonText,  this.isLoading=false,
   });
   final Function()? onPressed;
   final String buttonText;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class CustomButton extends StatelessWidget {
           height: 50.h,
           width: 300.w,
           child: Center(
-            child: Text(
+            child: isLoading?spinKit(color: kButtonTextColor):Text(
               buttonText,
               style:kBodyStyle3
             ),
