@@ -1,14 +1,18 @@
 import 'dart:async';
 
 import 'package:action_slider/action_slider.dart';
+import 'package:cash_driver/Models/RideModel.dart';
 import 'package:cash_driver/constants.dart';
 import 'package:cash_driver/resources/ride_methods.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' show cos, sqrt, asin;
 
+import '../utils/loader.dart';
 import '../utils/toast.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -119,10 +123,36 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Home',
                       style: kHeadingStyle1,
                     ),
-                    Text(
-                      '10 Points',
-                      style: kBodyStyle7,
-                    )
+                    StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .collection('rides').orderBy('dateTime',descending: true)
+                            .snapshots(),
+                        builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                        snapshot){
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return spinKit();
+                          }
+                          if (snapshot.data!.docs.isEmpty) {
+                            return Text(
+                              '0 Points',
+                              style: kBodyStyle7,
+                            );
+                          }
+                          int point=0;
+                          for(int i=0;i<snapshot.data!.docs.length;i++){
+                            RideModel ride = RideModel.fromJson(
+                                snapshot.data!.docs[i].data());
+                            point+=int.parse(ride.points);
+                          }
+                          return Text(
+                            '$point Points',
+                            style: kBodyStyle7,
+                          );
+                        }
+                    ),
                   ],
                 ),
               ),

@@ -5,13 +5,18 @@ import 'package:cash_driver/resources/auth_methods.dart';
 import 'package:cash_driver/utils/select_image.dart';
 import 'package:cash_driver/widgets/custom_button.dart';
 import 'package:cash_driver/widgets/custom_text_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../Models/RideModel.dart';
 import '../Models/UserModel.dart';
 import '../provider/user_provider.dart';
+import '../utils/loader.dart';
 import '../utils/toast.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -111,6 +116,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   SizedBox(
                     height: 30.h,
+                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .collection('rides').orderBy('dateTime',descending: true)
+                          .snapshots(),
+                      builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                      snapshot){
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return spinKit();
+                        }
+                        if (snapshot.data!.docs.isEmpty) {
+                          return PointsTile(points: '0', dateTime: DateTime.now());
+                        }
+                        int point=0;
+                        for(int i=0;i<snapshot.data!.docs.length;i++){
+                          RideModel ride = RideModel.fromJson(
+                              snapshot.data!.docs[i].data());
+                          point+=int.parse(ride.points);
+                        }
+                        return PointsTile(points: point.toString(), dateTime: DateTime.now());
+                      }
+                  ),
+                  SizedBox(
+                    height: 20.h,
                   ),
                   Form(
                     key: profileKey,
@@ -229,3 +261,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+class PointsTile extends StatelessWidget {
+  final String points;
+  final DateTime dateTime;
+  const PointsTile({
+    Key? key,
+    required this.points,
+    required this.dateTime,
+  }) : super(key: key);
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.h),
+      child: Container(
+        height: 80.h,
+        width: double.infinity,
+        padding: EdgeInsets.all(10.h),
+        decoration: BoxDecoration(
+          color: kWhiteColor,//const Color(0xFF06E96D),
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0.w, 4.h),
+              blurRadius: 4.r,
+              color: Colors.black.withOpacity(0.25),
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0.w),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                          left: 0,
+                          bottom:-2.h,
+                          child: Text(
+                            '${DateFormat.MMMd().format(dateTime)} - ${DateFormat.jm().format(dateTime)}',
+                            style: kBodyStyle6a,
+                          )),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0.h),
+                        child: Row(
+                          children: [
+                            Icon(Icons.check_circle),
+                            SizedBox(width: 5,),
+                            Text(
+                              'Total Points',
+                              style:kBodyStyle5a,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 15.0.w),
+              child: Text(
+                points,
+                style: kBodyStyle5a,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
