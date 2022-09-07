@@ -42,8 +42,12 @@ final kBodyStyle4 = GoogleFonts.poppins(
 //     color: kWhiteColor, fontSize: 15.sp, fontWeight: FontWeight.w400);
 final kBodyStyle5 = GoogleFonts.poppins(
     color: kSecondaryColor, fontSize: 24.sp, fontWeight: FontWeight.w400);
+final kBodyStyle5a = GoogleFonts.poppins(
+    color: kSecondaryColor, fontSize: 20.sp, fontWeight: FontWeight.w400);
 final kBodyStyle6 = GoogleFonts.poppins(
     color: kSecondaryColor, fontSize: 15.sp, fontWeight: FontWeight.w400);
+final kBodyStyle6a = GoogleFonts.poppins(
+    color: kSecondaryColor, fontSize: 12.sp, fontWeight: FontWeight.w400);
 final kBodyStyle7 = GoogleFonts.poppins(
     color: const Color(0xFF707070), fontSize: 20.sp, fontWeight: FontWeight.w400);
 final kBodyStyle8 = GoogleFonts.poppins(

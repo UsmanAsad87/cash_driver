@@ -76,8 +76,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
                           itemBuilder: (context, index) {
                             RideModel ride = RideModel.fromJson(
                                 snapshot.data!.docs[index].data());
-                            print(snapshot.data!.docs[index].data());
-                            print(ride.distance);
                             return ActivityTile(kms: ride.distance,  points:ride.points, isAlert: ride.isSpeedLess20);
                           },
                         );
