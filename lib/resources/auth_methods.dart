@@ -3,13 +3,12 @@ import 'dart:typed_data';
 import 'package:cash_driver/Models/UserModel.dart';
 import 'package:cash_driver/resources/storage_methods.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/user_provider.dart';
-
 
 class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -37,7 +36,15 @@ class AuthMethods {
           email: email, password: password);
 
       //print(cred.user!.uid);
-      UserModel user = UserModel(address: address, age: '', cryptoWalletKey: cryptoWalletKey, name: name, email: email, uid: cred.user!.uid, profilePic: '', phoneNumber: phoneNumber);
+      UserModel user = UserModel(
+          address: address,
+          age: '',
+          cryptoWalletKey: cryptoWalletKey,
+          name: name,
+          email: email,
+          uid: cred.user!.uid,
+          profilePic: '',
+          phoneNumber: phoneNumber);
 
       await _firestore
           .collection('users')
@@ -49,24 +56,33 @@ class AuthMethods {
     }
     return res;
   }
-  Future<String> updateUser({
-    required Uint8List? file,
-    required String email,
-    required String age,
-    required String name,
-    required String phoneNumber,
-    required String address,
-    required UserModel userdata,
-    required BuildContext context
-  }) async {
+
+  Future<String> updateUser(
+      {required Uint8List? file,
+      required String email,
+      required String age,
+      required String name,
+      required String phoneNumber,
+      required String address,
+      required String cryptoWalletKey,
+      required UserModel userdata,
+      required BuildContext context}) async {
     String res = "Some error occurred";
     try {
-      String photoUrl=userdata.profilePic;
-      if(file!=null){
+      String photoUrl = userdata.profilePic;
+      if (file != null) {
         photoUrl = await StorageMethods().uploadImageToStorage(file);
       }
 
-      UserModel user = UserModel(address: address, age: age, cryptoWalletKey: userdata.cryptoWalletKey, name: name, email: email, uid: userdata.uid, profilePic: photoUrl, phoneNumber: phoneNumber);
+      UserModel user = UserModel(
+          address: address,
+          age: age,
+          cryptoWalletKey: cryptoWalletKey,
+          name: name,
+          email: email,
+          uid: userdata.uid,
+          profilePic: photoUrl,
+          phoneNumber: phoneNumber);
 
       await _firestore
           .collection('users')
@@ -130,45 +146,41 @@ class AuthMethods {
   //   return res;
   // }
 
-
   Future<String> signInWithGoogle(context) async {
     String res = "some error occurred";
     try {
-      final GoogleSignInAccount? googleUser=await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth= await googleUser?.authentication;
-      if(googleAuth?.accessToken != null && googleAuth?.idToken !=null){
-        final credential =GoogleAuthProvider.credential(
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+      if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
+        final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth?.accessToken,
           idToken: googleAuth?.idToken,
         );
 
-        UserCredential userCredential=await _auth.signInWithCredential(credential);
-        if(userCredential.user!=null){
-          if(userCredential.additionalUserInfo!.isNewUser){
+        UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+        if (userCredential.user != null) {
+          if (userCredential.additionalUserInfo!.isNewUser) {
             UserModel user = UserModel(
                 address: '',
                 age: '',
                 cryptoWalletKey: '',
-                name: userCredential.user!.displayName??'',
-                email: userCredential.user!.email??'',
+                name: userCredential.user!.displayName ?? '',
+                email: userCredential.user!.email ?? '',
                 uid: userCredential.user!.uid,
-                profilePic: userCredential.user!.photoURL??'',
-                phoneNumber: userCredential.user!.phoneNumber??''
-            );
+                profilePic: userCredential.user!.photoURL ?? '',
+                phoneNumber: userCredential.user!.phoneNumber ?? '');
 
             await _firestore
                 .collection('users')
                 .doc(userCredential.user!.uid)
                 .set(user.toJson());
-          }else{
-
-
-          }
-        }else{
-          res='Error while signing in';
+          } else {}
+        } else {
+          res = 'Error while signing in';
           return res;
         }
-
       }
       res = 'success';
     } catch (err) {

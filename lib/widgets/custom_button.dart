@@ -1,14 +1,15 @@
 import 'package:cash_driver/constants.dart';
 import 'package:cash_driver/utils/loader.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomButton extends StatelessWidget {
   CustomButton({
     required this.onPressed,
-    required this.buttonText,  this.isLoading=false,
+    required this.buttonText,
+    this.isLoading = false,
   });
+
   final Function()? onPressed;
   final String buttonText;
   final bool isLoading;
@@ -31,16 +32,15 @@ class CustomButton extends StatelessWidget {
         fillColor: const Color(0xFF0D2516),
         onPressed: onPressed,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
-         ),
+          borderRadius: BorderRadius.circular(20.r),
+        ),
         child: SizedBox(
           height: 50.h,
           width: 300.w,
           child: Center(
-            child: isLoading?spinKit(color: kButtonTextColor):Text(
-              buttonText,
-              style:kBodyStyle3
-            ),
+            child: isLoading
+                ? spinKit(color: kButtonTextColor)
+                : Text(buttonText, style: kBodyStyle3),
           ),
         ),
       ),

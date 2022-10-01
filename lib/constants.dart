@@ -6,7 +6,7 @@ const networkImageUrl =
     'https://i.pinimg.com/originals/06/81/39/068139bff0b22024e775bfcbb42ed3b4.jpg';
 
 
-final kPrimaryColor = Color(0xFF21B061).withOpacity(0.9);
+const kPrimaryColor = Color(0xFF24AE63);
 const kSecondaryColor = Color(0xFF000000);
 const kSecondaryColor2 = Color(0xFFF2F2F2);
 

@@ -6,12 +6,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-
-
-
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
    <application
-        android:label="cash_driver"
+        android:label="Cash Driver"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -35,6 +33,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+       <meta-data
+           android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyCIAQSWoAC-7bSHWyUEcUdUGwUfiEWqF3U" />
+       <!-- Don't delete the meta-data below.
+            This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

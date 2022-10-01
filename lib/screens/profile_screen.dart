@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:cash_driver/constants.dart';
 import 'package:cash_driver/resources/auth_methods.dart';
+import 'package:cash_driver/screens/login_screen.dart';
 import 'package:cash_driver/utils/select_image.dart';
 import 'package:cash_driver/widgets/custom_button.dart';
 import 'package:cash_driver/widgets/custom_text_field.dart';
@@ -21,6 +22,7 @@ import '../utils/toast.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile_screen';
+
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
@@ -32,8 +34,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _addController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _cryptoWalletKeyController =
+      TextEditingController();
   Uint8List? _image;
+  int point = 0;
 
   @override
   void dispose() {
@@ -41,9 +45,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _ageController.dispose();
     _nameController.dispose();
     _addController.dispose();
-    _phoneController.dispose();
+    _cryptoWalletKeyController.dispose();
     super.dispose();
   }
+
   void selectImage() async {
     Uint8List im = await pickImage(ImageSource.gallery);
     setState(() {
@@ -58,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emailController.text = user.email;
     _ageController.text = user.age;
     _addController.text = user.address;
-    _phoneController.text = user.phoneNumber;
+    _cryptoWalletKeyController.text = user.cryptoWalletKey;
 
     bool _isLoading = false;
     GlobalKey<FormState> profileKey = GlobalKey<FormState>();
@@ -77,40 +82,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 40.h,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 10.h),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0.w, 4.h),
+                            blurRadius: 4.r,
+                            color: Colors.black.withOpacity(0.25),
+                          )
+                        ],
+                      ),
+                      child: RawMaterialButton(
+                        elevation: 2,
+                        fillColor: const Color(0xFF0D2516),
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                          if (!mounted) return;
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()));
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: SizedBox(
+                          height: 50.h,
+                          width: 150.w,
+                          child: Center(
+                            child: Text('Logout', style: kBodyStyle3),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   Center(
                     child: Stack(
                       children: [
                         _image != null
                             ? CircleAvatar(
-                            radius: 60.r, backgroundImage: MemoryImage(_image!))
+                                radius: 60.r,
+                                backgroundImage: MemoryImage(_image!))
                             : user.profilePic.isEmpty
-                            ? CircleAvatar(
-                            radius: 60.r,
-                            backgroundImage: NetworkImage(networkImageUrl))
-                            : CircleAvatar(
-                            radius: 60.r,
-                            backgroundImage: NetworkImage(
-                              user.profilePic,
-                            )),
+                                ? CircleAvatar(
+                                    radius: 60.r,
+                                    backgroundImage:
+                                        NetworkImage(networkImageUrl))
+                                : CircleAvatar(
+                                    radius: 60.r,
+                                    backgroundImage: NetworkImage(
+                                      user.profilePic,
+                                    )),
                         Positioned(
                             right: 2,
                             bottom: 2,
                             child: CircleAvatar(
                                 radius: 15,
-                                backgroundColor:kEditButtonColor,
+                                backgroundColor: kEditButtonColor,
                                 child: Center(
                                     child: IconButton(
                                         onPressed: selectImage,
-                                        icon:  Icon(
+                                        icon: Icon(
                                           Icons.edit,
                                           size: 15,
-                                          color:
-                                          kPrimaryColor,
+                                          color: kPrimaryColor,
                                         )))))
-
                       ],
                     ),
                   ),
@@ -121,26 +160,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       stream: FirebaseFirestore.instance
                           .collection('users')
                           .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .collection('rides').orderBy('dateTime',descending: true)
+                          .collection('rides')
+                          .orderBy('dateTime', descending: true)
                           .snapshots(),
-                      builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                      snapshot){
+                      builder: (context,
+                          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                              snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return spinKit();
                         }
                         if (snapshot.data!.docs.isEmpty) {
-                          return PointsTile(points: '0', dateTime: DateTime.now());
+                          return PointsTile(
+                              points: '0', dateTime: DateTime.now());
                         }
-                        int point=0;
-                        for(int i=0;i<snapshot.data!.docs.length;i++){
-                          RideModel ride = RideModel.fromJson(
-                              snapshot.data!.docs[i].data());
-                          point+=int.parse(ride.points);
+
+                        for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                          RideModel ride =
+                              RideModel.fromJson(snapshot.data!.docs[i].data());
+                          point += int.parse(ride.points);
                         }
-                        return PointsTile(points: point.toString(), dateTime: DateTime.now());
-                      }
-                  ),
+                        return PointsTile(
+                            points: point.toString(), dateTime: DateTime.now());
+                      }),
                   SizedBox(
                     height: 20.h,
                   ),
@@ -169,35 +211,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             hintText: '',
                             onChanged: (val) {},
                             onFieldSubmitted: (val) {}),
+                        // Text(
+                        //   'Age',
+                        //   style: kHeadingStyle3,
+                        // ),
+                        // CustomTextField2(
+                        //     obscure: false,
+                        //     controller: _ageController,
+                        //     hintText: '',
+                        //     onChanged: (val) {},
+                        //     onFieldSubmitted: (val) {}),
+                        // Text(
+                        //   'Address',
+                        //   style: kHeadingStyle3,
+                        // ),
+                        // CustomTextField2(
+                        //     obscure: false,
+                        //     controller: _addController,
+                        //     hintText: '',
+                        //     onChanged: (val) {},
+                        //     onFieldSubmitted: (val) {}),
                         Text(
-                          'Age',
-                          style: kHeadingStyle3,
-                        ),
-                        CustomTextField2(
-                            obscure: false,
-                            controller: _ageController,
-                            hintText: '',
-                            onChanged: (val) {},
-                            onFieldSubmitted: (val) {}),
-                        Text(
-                          'Address',
-                          style: kHeadingStyle3,
-                        ),
-                        CustomTextField2(
-                            obscure: false,
-                            controller: _addController,
-                            hintText: '',
-                            onChanged: (val) {},
-                            onFieldSubmitted: (val) {}),
-                        Text(
-                          'Contact',
+                          'Crypto Wallet Key',
                           style: kHeadingStyle3,
                         ),
                         CustomTextField2(
                             obscure: false,
                             inputType: TextInputType.phone,
-                            controller: _phoneController,
-                            hintText: '',
+                            controller: _cryptoWalletKeyController,
+                            hintText: 'Crypto Wallet Key',
                             onChanged: (val) {},
                             onFieldSubmitted: (val) {}),
                       ],
@@ -208,10 +250,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           isLoading: _isLoading,
                           onPressed: () async {
                             if (_emailController.text.isEmpty ||
-                                _ageController.text.isEmpty ||
+                                //_ageController.text.isEmpty ||
                                 _nameController.text.isEmpty ||
-                                _phoneController.text.isEmpty ||
-                                _addController.text.isEmpty) {
+                                //_phoneController.text.isEmpty ||
+                                _cryptoWalletKeyController.text.isEmpty) {
                               showFlagMsg(
                                   context: context,
                                   msg: 'Enter all required fields',
@@ -227,10 +269,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               String res = await AuthMethods().updateUser(
                                   file: _image,
                                   email: _emailController.text,
-                                  age: _ageController.text,
+                                  //age: _ageController.text,
+                                  age: '',
                                   name: _nameController.text,
-                                  phoneNumber: _phoneController.text,
-                                  address: _addController.text,
+                                  // phoneNumber: _phoneController.text,
+                                  phoneNumber: '',
+                                  // address: _addController.text,
+                                  address: '',
+                                  cryptoWalletKey: '',
                                   context: context,
                                   userdata: user);
                               setState(() {
@@ -265,12 +311,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 class PointsTile extends StatelessWidget {
   final String points;
   final DateTime dateTime;
+
   const PointsTile({
     Key? key,
     required this.points,
     required this.dateTime,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +327,7 @@ class PointsTile extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(10.h),
         decoration: BoxDecoration(
-          color: kWhiteColor,//const Color(0xFF06E96D),
+          color: kWhiteColor, //const Color(0xFF06E96D),
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
@@ -303,7 +349,7 @@ class PointsTile extends StatelessWidget {
                     children: [
                       Positioned(
                           left: 0,
-                          bottom:-2.h,
+                          bottom: -2.h,
                           child: Text(
                             '${DateFormat.MMMd().format(dateTime)} - ${DateFormat.jm().format(dateTime)}',
                             style: kBodyStyle6a,
@@ -313,10 +359,12 @@ class PointsTile extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.check_circle),
-                            SizedBox(width: 5,),
+                            SizedBox(
+                              width: 5,
+                            ),
                             Text(
                               'Total Points',
-                              style:kBodyStyle5a,
+                              style: kBodyStyle5a,
                             ),
                           ],
                         ),
@@ -327,7 +375,7 @@ class PointsTile extends StatelessWidget {
               ],
             ),
             Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 15.0.w),
+              padding: EdgeInsets.symmetric(horizontal: 15.0.w),
               child: Text(
                 points,
                 style: kBodyStyle5a,
@@ -339,4 +387,3 @@ class PointsTile extends StatelessWidget {
     );
   }
 }
-

@@ -5,11 +5,12 @@ import 'package:cash_driver/utils/toast.dart';
 import 'package:cash_driver/utils/validator.dart';
 import 'package:cash_driver/widgets/custom_button.dart';
 import 'package:cash_driver/widgets/custom_text_field.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignupScreen extends StatefulWidget {
   static const routeName = '/signup_screen';
+
   const SignupScreen({
     Key? key,
   }) : super(key: key);
@@ -127,28 +128,28 @@ class _SignupScreenState extends State<SignupScreen> {
                                   hintText: 'Enter your email',
                                   onChanged: (val) {},
                                   onFieldSubmitted: (val) {}),
-                              Text(
-                                'Address',
-                                style: kHeadingStyle2,
-                              ),
-                              CustomTextField(
-                                  obscure: false,
-                                  controller: _addController,
-                                  hintText: 'Enter your address',
-                                  onChanged: (val) {},
-                                  onFieldSubmitted: (val) {}),
-                              Text(
-                                'Contact No.',
-                                style: kHeadingStyle2,
-                              ),
-                              CustomTextField(
-                                  obscure: false,
-                                  validatorFn: phoneValidator,
-                                  inputType: TextInputType.phone,
-                                  controller: _phoneController,
-                                  hintText: 'Enter your contact no.',
-                                  onChanged: (val) {},
-                                  onFieldSubmitted: (val) {}),
+                              // Text(
+                              //   'Address',
+                              //   style: kHeadingStyle2,
+                              // ),
+                              // CustomTextField(
+                              //     obscure: false,
+                              //     controller: _addController,
+                              //     hintText: 'Enter your address',
+                              //     onChanged: (val) {},
+                              //     onFieldSubmitted: (val) {}),
+                              // Text(
+                              //   'Contact No.',
+                              //   style: kHeadingStyle2,
+                              // ),
+                              // CustomTextField(
+                              //     obscure: false,
+                              //     validatorFn: phoneValidator,
+                              //     inputType: TextInputType.phone,
+                              //     controller: _phoneController,
+                              //     hintText: 'Enter your contact no.',
+                              //     onChanged: (val) {},
+                              //     onFieldSubmitted: (val) {}),
                               Text(
                                 'Crypto Wallet Key',
                                 style: kHeadingStyle2,
@@ -189,13 +190,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         Center(
                             child: CustomButton(
-                              isLoading: _isLoading,
+                                isLoading: _isLoading,
                                 onPressed: () async {
                                   if (_emailController.text.isEmpty ||
                                       _passController.text.isEmpty ||
                                       _nameController.text.isEmpty ||
-                                      _phoneController.text.isEmpty ||
-                                      _addController.text.isEmpty ||
+                                      //_phoneController.text.isEmpty ||
+                                      //_addController.text.isEmpty ||
                                       _cryptoKeyController.text.isEmpty ||
                                       _passConfirmController.text.isEmpty) {
                                     showFlagMsg(
@@ -222,8 +223,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                         email: _emailController.text,
                                         password: _passController.text,
                                         name: _nameController.text,
-                                        phoneNumber: _phoneController.text,
-                                        address: _addController.text,
+                                        //phoneNumber: _phoneController.text,
+                                        phoneNumber: '',
+                                        //address: _addController.text,
+                                        address: '',
                                         cryptoWalletKey:
                                             _cryptoKeyController.text);
                                     setState(() {
@@ -236,10 +239,13 @@ class _SignupScreenState extends State<SignupScreen> {
                                           textColor: Colors.red);
                                     } else {
                                       showToast('Account Created Successfully');
+
+                                      if (!mounted) return;
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (_) => const LoginScreen()));
+                                              builder: (_) =>
+                                                  const LoginScreen()));
                                     }
                                   } else {
                                     showFlagMsg(
@@ -249,39 +255,42 @@ class _SignupScreenState extends State<SignupScreen> {
                                   }
                                 },
                                 buttonText: 'Sign Up')),
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/fb.png',
-                                    scale: 2,
-                                  )),
-                              SizedBox(
-                                width: 15.w,
-                              ),
-                              InkWell(
-                                  onTap: () {},
-                                  child: Image.asset(
-                                    'assets/twitter.png',
-                                    scale: 2,
-                                  )),
-                              SizedBox(
-                                width: 15.w,
-                              ),
-                              InkWell(
-                                  onTap: () {
-                                    //AuthMethods().signInWithGoogle(context);
-                                  },
-                                  child: Image.asset(
-                                    'assets/linkedin.png',
-                                    scale: 2,
-                                  )),
-                            ],
-                          ),
+                        // Padding(
+                        //   padding: EdgeInsets.symmetric(vertical: 10.h),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       InkWell(
+                        //           onTap: () {},
+                        //           child: Image.asset(
+                        //             'assets/fb.png',
+                        //             scale: 2,
+                        //           )),
+                        //       SizedBox(
+                        //         width: 15.w,
+                        //       ),
+                        //       InkWell(
+                        //           onTap: () {},
+                        //           child: Image.asset(
+                        //             'assets/twitter.png',
+                        //             scale: 2,
+                        //           )),
+                        //       SizedBox(
+                        //         width: 15.w,
+                        //       ),
+                        //       InkWell(
+                        //           onTap: () {
+                        //             //AuthMethods().signInWithGoogle(context);
+                        //           },
+                        //           child: Image.asset(
+                        //             'assets/linkedin.png',
+                        //             scale: 2,
+                        //           )),
+                        //     ],
+                        //   ),
+                        // ),
+                        SizedBox(
+                          height: 20.h,
                         ),
                         InkWell(
                           onTap: () {},
