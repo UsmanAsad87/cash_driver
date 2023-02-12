@@ -35,6 +35,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _phoneController = TextEditingController();
   Uint8List? _image;
 
+  bool _isLoading = false;
+  GlobalKey<FormState> profileKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -60,8 +63,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _addController.text = user.address;
     _phoneController.text = user.phoneNumber;
 
-    bool _isLoading = false;
-    GlobalKey<FormState> profileKey = GlobalKey<FormState>();
 
     return Scaffold(
       backgroundColor: kSecondaryColor2,
@@ -252,6 +253,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             }
                           },
                           buttonText: 'Update Profile')),
+                  Center(
+                      child: CustomButton(
+                          isLoading: _isLoading,
+                          onPressed: (){
+                            AuthMethods().signOut();
+                          },
+                          buttonText: 'Logout')),
+                  SizedBox(height: 20.h,)
                 ],
               ),
             ),

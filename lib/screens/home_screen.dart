@@ -242,77 +242,80 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(
                           height: 80.h,
                         ),
-                        Center(
-                          child: ActionSlider.standard(
-                            width: 350.w,
-                            height: 70.h,
-                            backgroundColor: _isTracking? Colors.red.withOpacity(0.5):const Color(0xFF36B770),
-                            toggleColor: Colors.white,
-                            actionThresholdType: ThresholdType.release,
-                            child: _isTracking
-                                ? const Text('Slide to Stop Tracking',style: TextStyle(color: Colors.white),)
-                                : const Text('Slide to Start Tracking'),
-                            action: (controller) async {
-                              setState(() {
-                                _isTracking = !_isTracking;
-                              });
-                              if (_isTracking == false) {
-                                calTotalDistance();
-                                print(totalDistance.toString().substring(0,3));
-                                print(points);
-                                print(_isSpeedLess20.toString());
+                        Expanded(
+                          child: Center(
+                            child: ActionSlider.standard(
+                              width: 350.w,
+                              height: 70.h,
+                              backgroundColor: _isTracking? Colors.red.withOpacity(0.5):const Color(0xFF36B770),
+                              toggleColor: Colors.white,
+                              actionThresholdType: ThresholdType.release,
+                              child: _isTracking
+                                  ? const Text('Slide to Stop Tracking',style: TextStyle(color: Colors.white),)
+                                  : const Text('Slide to Start Tracking'),
+                              action: (controller) async {
+                                setState(() {
+                                  _isTracking = !_isTracking;
+                                });
+                                if (_isTracking == false) {
+                                  calTotalDistance();
+                                  print(totalDistance.toString().substring(0,3));
+                                  print(points);
+                                  print(_isSpeedLess20.toString());
 
-                                if (totalDistance == 0 || points == 0) {
-                                  showFlagMsg(
-                                      context: context,
-                                      msg: 'Distance Tracked is 0',
-                                      textColor: Colors.red);
-                                  return null;
+                                  if (totalDistance == 0 || points == 0) {
+                                    await Future.delayed(const Duration(seconds: 1)).then((value) =>
+                                    showFlagMsg(
+                                        context: context,
+                                        msg: 'Distance Tracked is 0',
+                                        textColor: Colors.red));
+                                    return null;
+                                  }
+                                  String dis;
+                                  if(totalDistance<10){
+                                    dis=totalDistance.toString().substring(0,3);
+                                  }else if(totalDistance<100){
+                                    dis=totalDistance.toString().substring(0,4);
+                                  }else{
+                                    dis=totalDistance.toString().substring(0,5);
+                                  }
+                                  String res = await RideMethods().createRide(
+                                      distance: dis,
+                                      isSpeedLess20: _isSpeedLess20,
+                                      points: points.toInt().toString());
+                                  if (res != 'success') {
+                                    showFlagMsg(
+                                        context: context,
+                                        msg: res,
+                                        textColor: Colors.red);
+                                  } else {
+                                    showToast('Tracked data saved Successfully');
+                                  }
+                                  return;
                                 }
-                                String dis;
-                                if(totalDistance<10){
-                                  dis=totalDistance.toString().substring(0,3);
-                                }else if(totalDistance<100){
-                                  dis=totalDistance.toString().substring(0,4);
-                                }else{
-                                  dis=totalDistance.toString().substring(0,5);
-                                }
-                                String res = await RideMethods().createRide(
-                                    distance: dis,
-                                    isSpeedLess20: _isSpeedLess20,
-                                    points: points.toInt().toString());
-                                if (res != 'success') {
-                                  showFlagMsg(
-                                      context: context,
-                                      msg: res,
-                                      textColor: Colors.red);
-                                } else {
-                                  showToast('Tracked data saved Successfully');
-                                }
-                                return;
-                              }
-                              data.clear();
-                              totalDistance = 0;
-                              points = 0;
-                              _isSpeedLess20 = false;
+                                data.clear();
+                                totalDistance = 0;
+                                points = 0;
+                                _isSpeedLess20 = false;
 
-                              controller.loading(); //starts loading animation
-                              Position position =
-                                  await _getGeoLocationPosition();
-                              // String location ='Lat: ${position.latitude} , Long: ${position.longitude}';
-                              // print(location);
+                                //controller.loading(); //starts loading animation
+                                Position position =
+                                    await _getGeoLocationPosition();
 
-                              controller.success(); //starts success animation
-                              await Future.delayed(const Duration(seconds: 1));
-                              controller.reset(); //resets the slider
+                               // controller.success(); //starts success animation
+                                await Future.delayed(const Duration(seconds: 2));
+                                //controller.reset(); //resets the slider
 
-                              // while (_isTracking) {
-                              //   await Future.delayed(const Duration(seconds: 5));
-                              //   position = await _getGeoLocationPosition();
-                              //   location ='Lat: ${position.latitude} , Long: ${position.longitude}';
-                              //   print(location);
-                              // }
-                            },
+
+                                //alternative of Position Strea,m
+                                // while (_isTracking) {
+                                //   await Future.delayed(const Duration(seconds: 5));
+                                //   position = await _getGeoLocationPosition();
+                                //   location ='Lat: ${position.latitude} , Long: ${position.longitude}';
+                                //   print(location);
+                                // }
+                              },
+                            ),
                           ),
                         ),
                       ],
